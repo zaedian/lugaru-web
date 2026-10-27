@@ -1,0 +1,116 @@
+# Lugaru assets licenses
+
+## Wolfire assets (CC-BY-SA 3.0 Unported)
+
+All assets from the original Lugaru game (including Lugaru HD assets)
+are distributed under the Creative Commons Attribution-Share Alike license
+in version 3.0 Unported (CC-BY-SA 3.0 Unported):
+http://creativecommons.org/licenses/by-sa/3.0/
+
+Attribution to Wolfire Games: http://www.wolfire.com
+
+Those assets are all the files in the `Data` folder, except from the
+ones listed below with different licenses or credits.
+
+
+## OSS Lugaru assets (CC-BY-SA 4.0 International)
+
+Assets contributed by the OSS Lugaru project:
+
+Data/Textures/ClFeng.png
+Data/Textures/ClHuo.png
+Data/Textures/ClShan.png
+Data/Textures/ClShui.png
+Data/Textures/FurBW.jpg
+
+
+## Silb assets (CC-BY-SA 3.0 Unported)
+
+https://web.archive.org/web/20161213062413/http://forums.wolfire.com/viewtopic.php?f=7&t=1066
+
+These assets are from the Temple campaign by Silb under CC-BY-SA 3.0 Unported:
+
+Data/Campaigns/temple.txt
+
+Data/Maps/sven*
+
+Data/Textures/DesertCl.png
+Data/Textures/GiTop.png
+Data/Textures/GiTeared.png
+Data/Textures/GiBottom.png
+Data/Textures/Mask.png
+Data/Textures/temple/World.png
+
+
+## Jendraz assets (CC-BY-SA 4.0 International)
+
+https://web.archive.org/web/20161213062036/http://forums.wolfire.com/viewtopic.php?f=7&t=3797
+
+These assets are from the Empire campaign by Jendraz, licensed under CC-BY-SA
+4.0 International:
+
+Data/Campaigns/empire.txt
+
+Data/Maps/jendraz*
+
+
+## Philtron R. assets (CC-BY-SA 4.0 International)
+
+https://web.archive.org/web/20161214063840/http://forums.wolfire.com/viewtopic.php?f=7&t=4633
+
+These assets are from the Seven Tasks campaign by Philtron R., licensed under
+CC-BY-SA 4.0 International:
+
+Data/Campaigns/seventasks.txt
+
+Data/Maps/task*
+
+## Modifications in Lugaru-Web
+
+Lugaru-Web contains preservation and compatibility changes to assets and maps
+distributed under the licenses above.
+
+Lugaru-Web modifications to bundled CC-licensed content include:
+
+- Empire campaign map fixes to `Data/Maps/jendraz1`, `Data/Maps/jendraz2` and
+  `Data/Maps/jendraz11`.
+- Temple campaign map fixes to:
+  - `Data/Maps/svenclimb`
+  - `Data/Maps/svenheaven`
+  - `Data/Maps/svenroad`
+  - `Data/Maps/svendecoy`
+  - `Data/Maps/svencouncil`
+  - `Data/Maps/svendoor`
+  - `Data/Maps/svenchasm`
+  - `Data/Maps/svenfireice`
+  - `Data/Maps/svenforest`
+  - `Data/Maps/svenfort`
+  - `Data/Maps/svenninja`
+  - `Data/Maps/svenredbwafter`
+  - `Data/Maps/svenruins`
+  - `Data/Maps/svenshan`
+  - `Data/Maps/sventemple`
+  - `Data/Maps/sventemple2`
+  - `Data/Maps/sventhrone`
+- Seven Tasks map fix to `Data/Maps/task9` (removal of a duplicate dialogue
+  attached to the wrong character, and speaker-name normalization).
+- Campaign definition edits to `Data/Campaigns/main.txt`,
+  `Data/Campaigns/empire.txt`, `Data/Campaigns/seventasks.txt` and
+  `Data/Campaigns/temple.txt`: campaign start labels, the Temple final level
+  label, and campaign ending text.
+- `Data/Textures/Fur.png`, an RGBA conversion derived from the existing
+  Wolfire `Fur.jpg` artwork for correct clothing tint behavior.
+- Restoration of `Data/Textures/FurBW.jpg`, originally contributed to the
+  OSS Lugaru project and distributed under CC-BY-SA 4.0 International.
+
+These changes were made by the Lugaru-Web project in 2026 for browser
+compatibility, preservation, restoration of intended historical behavior, or
+removal of stale or erroneous campaign data found during release testing.
+
+Temple campaign ending text: the `EndText` in `Data/Campaigns/temple.txt`
+(beginning "Sven has slain the Water Temple master.") was newly written for
+Lugaru-Web in 2026. It is not recovered original Temple campaign text. It
+replaced a placeholder added by the OSS Lugaru project in 2017, which invited
+players to propose an ending. As a modification of the Temple campaign file,
+it is distributed under the applicable campaign-content license identified
+above.

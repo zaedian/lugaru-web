@@ -1,0 +1,37 @@
+{
+  "name": "Loupgarenne dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "features": {},
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "cmake.configureOnOpen": false,
+        "git.autofetch": true
+      }
+    }
+  },
+
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ],
+
+  "postCreateCommand": "echo 'Devcontainer ready. Use build scripts in .devcontainer/ for different platforms.'",
+
+  "forwardPorts": [],
+
+  "shutdownAction": "stopContainer"
+}

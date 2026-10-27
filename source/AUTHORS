@@ -1,0 +1,30 @@
+Original developer:
+
+David Rosen, Wolfire Games
+
+Contributors to the open source project, in alphabetical order:
+
+Alexander Monakov
+Côme Chilliet (MCMic)
+David Rosen
+Harley Laue
+Jendraz
+Neal Gompa
+Philtron R.
+Rémi Verschelde (akien)
+Ryan C. Gordon (icculus)
+sf17k
+Silb
+Vadim Trochinsky
+
+Loupgarenne fork:
+
+Ryan Deering
+
+Lugaru-Web:
+
+Logan Walker
+
+Lugaru-Web builds on Ryan Deering's Loupgarenne fork and its WebAssembly work,
+which in turn builds on the open-source Lugaru project and the original game
+by David Rosen / Wolfire Games.

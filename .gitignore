@@ -1,0 +1,4 @@
+emsdk/
+docs/*.js.map
+docs/*.html.map
+docs/*.mem

@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+<link rel="icon" href="icons/lugaru-icon.ico" type="image/x-icon">
+<meta charset="utf-8">
+<title>Lugaru</title>
+</head>
+<body style="margin:0;background:#000">
+<canvas id="canvas" tabindex="-1" style="width:100vw;height:100vh;display:block" oncontextmenu="event.preventDefault()"></canvas>
+<script>
+  // Missing helper in Emscripten's GL emulation (release builds)
+  var warnOnce = (function () {
+    var seen = {};
+    return function (t) { if (!seen[t]) { seen[t] = 1; console.warn(t); } };
+  })();
+
+  (function () {
+    var c = document.getElementById('canvas');
+    function resize() {
+      var dpr = window.devicePixelRatio || 1;
+      var w = c.clientWidth || window.innerWidth;
+      var h = c.clientHeight || window.innerHeight;
+      c.width = Math.round(w * dpr);
+      c.height = Math.round(h * dpr);
+    }
+    resize();
+    window.resizeCanvas = resize;
+    window.addEventListener('resize', resize);
+  })();
+
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    print: function (t) { if (typeof t === 'string' && t.indexOf('LIBGL:') !== -1) return; console.log(t); },
+    printErr: function (t) { if (typeof t === 'string' && t.indexOf('LIBGL:') !== -1) return; console.error(t); },
+    preRun: [function () {
+      // Persist user profile/config data across reloads via IndexedDB-backed FS
+      try { Module['FS'].mount(Module['IDBFS'], {}, '/home/web_user/.local/share/lugaru'); } catch(e){}
+      try { Module['FS'].mount(Module['IDBFS'], {}, '/home/web_user/.config/lugaru'); } catch(e){}
+      // Create the folder Lugaru saves its config and accounts in
+      var path = 'home/web_user/.config/lugaru';
+      if (Module.FS_createPath) {
+        Module.FS_createPath('/', path, true, true);
+      } else if (Module.FS && Module.FS.createPath) {
+        Module.FS.createPath('/', path, true, true);
+      } else {
+        console.error('FS not exported: relink with -s EXPORTED_RUNTIME_METHODS=FS,FS_createPath');
+      }
+    }]
+  };
+
+  // ------------------------------------------------------------------
+  // Safe pointer lock handling.
+  //
+  // requestPointerLock() returns a Promise in Chromium 63+ and can reject
+  // (user gesture required, lock transfer too fast, document not focused,
+  // "SecurityError") and it can also throw synchronously on some browsers
+  // when re-locking immediately after an unlock. An unhandled promise
+  // rejection here aborts the WASM event loop, so:
+  //   1. Catch and log every rejection / synchronous throw.
+  //   2. Debounce relock attempts so a capture-state switch cannot spam the
+  //      browser (which used to crash the rare "mouse re-capture" path).
+  //   3. Require a new user click on the canvas after the pointer is
+  //      unlocked (Esc, or a browser-forced unlock) before asking for the
+  //      lock again.
+  // ------------------------------------------------------------------
+  (function () {
+    var canvas = document.getElementById('canvas');
+    var lastAttempt = 0;        // timestamp of the last requestPointerLock attempt
+    var locked = false;         // is the pointer currently locked?
+    var needClick = false;      // must wait for a user click before re-locking
+    var RETRY_DELAY = 0;     // ms; suppress immediate auto-relocking
+
+    function safeRequestPointerLock() {
+      if (!canvas.requestPointerLock) return;
+      if (!nativeRequestPointerLock) return;
+      var now = performance.now();
+      if (now - lastAttempt < RETRY_DELAY) return;
+      if (needClick) return;    // require a fresh user interaction first
+      lastAttempt = now;
+      try {
+        // Call the browser's real implementation, not the wrapper installed
+        // below (calling the wrapper here would recurse into this function,
+        // hit the debounce and never actually lock the pointer).
+        var res = nativeRequestPointerLock();
+        if (res && typeof res.catch === 'function') {
+          res.catch(function (err) { needClick = true; });
+        }
+      } catch (e) {
+        needClick = true;
+      }
+    }
+
+    if (!document.pointerLockElement) {
+      // Legacy Safari: fall back to the webkit-prefixed API
+      if (Object.prototype.hasOwnProperty.call(canvas, 'webkitRequestPointerLock') == false && canvas.webkitRequestPointerLock) {
+        canvas.requestPointerLock = canvas.webkitRequestPointerLock.bind(canvas);
+      }
+    }
+
+    document.addEventListener('pointerlockchange', function () {
+      var isLocked = (document.pointerLockElement === canvas);
+      if (!isLocked) {
+        if (document.hasFocus && document.hasFocus()) {
+          setTimeout(function() { if (!document.pointerLockElement) safeRequestPointerLock(); }, 50);
+        } else {
+          needClick = true;
+        }
+      }
+      locked = isLocked;
+    });
+
+    document.addEventListener('pointerlockerror', function () {
+      needClick = true;
+    });
+
+    canvas.addEventListener('click', function () {
+      needClick = false;
+      if (!locked) safeRequestPointerLock();
+    });
+
+    // The game (SDL2) also calls this when it grabs/releases the mouse.
+    // Route it through the same guarded path so the promise is always handled.
+    if (canvas.requestPointerLock) {
+      // Capture the browser's native method before replacing it below.
+      var nativeRequestPointerLock = canvas.requestPointerLock ? canvas.requestPointerLock.bind(canvas) : null;
+      if (nativeRequestPointerLock) {
+        canvas.requestPointerLock = function () {
+          safeRequestPointerLock();
+          return undefined;
+        };
+      }
+    }
+  })();
+</script>
+<script>
+  function requestFullscreen() {
+    var elem = document.documentElement || document.body;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    else {
+      var c = document.getElementById('canvas');
+      if (c.requestFullscreen) c.requestFullscreen();
+      else if (c.webkitRequestFullscreen) c.webkitRequestFullscreen();
+    }
+  }
+  document.getElementById('canvas').addEventListener('click', function() {
+    // Fullscreen is now handled via Settings > Fullscreen option
+  });
+  document.addEventListener('fullscreenchange', function() { if (window.resizeCanvas) window.resizeCanvas(); });
+  document.addEventListener('webkitfullscreenchange', function() { if (window.resizeCanvas) window.resizeCanvas(); });
+</script>
+<script src="lugaru.js"></script>
+</body>
+</html>

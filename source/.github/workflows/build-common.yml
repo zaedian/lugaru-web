@@ -1,0 +1,292 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      create_archives:
+        description: 'Create compressed archives for release'
+        type: boolean
+        default: false
+    outputs:
+      version:
+        description: 'The version number extracted from CMakeLists.txt'
+        value: ${{ jobs.get-version.outputs.version }}
+
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: CMakeLists.txt
+          sparse-checkout-cone-mode: false
+
+      - name: Get version
+        id: version
+        run: |
+          MAJOR=$(awk '/set\(LUGARU_VERSION_MAJOR/ {gsub(/[^0-9]/, ""); print}' CMakeLists.txt)
+          MINOR=$(awk '/set\(LUGARU_VERSION_MINOR/ {gsub(/[^0-9]/, ""); print}' CMakeLists.txt)
+          VERSION="${MAJOR}.${MINOR}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+
+  build-linux:
+    needs: get-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            g++ \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libjpeg-dev \
+            libpng-dev \
+            libsdl2-dev \
+            libvorbis-dev \
+            libogg-dev \
+            libopenal-dev \
+            libjsoncpp-dev
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64
+
+      - name: Build
+        run: cmake --build build --config Release -j$(nproc)
+
+      - name: Install
+        run: cmake --install build --config Release
+
+      - name: Smoke test
+        run: |
+          echo "Verifying binary exists and is executable..."
+          test -x lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64/lugaru || test -x lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64/bin/lugaru
+          echo "Linux build smoke test passed"
+
+      - name: Create archive
+        if: ${{ inputs.create_archives }}
+        run: tar -czvf lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64.tar.gz lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64/
+
+      - name: Upload artifact (archive)
+        if: ${{ inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64.tar.gz
+
+      - name: Upload artifact (directory)
+        if: ${{ !inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-linux-x64/
+
+  build-macos:
+    needs: get-version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install arm64 dependencies
+        run: |
+          brew install \
+            cmake \
+            sdl2 \
+            libjpeg-turbo \
+            libpng \
+            libvorbis \
+            libogg \
+            openal-soft \
+            jsoncpp
+
+      - name: Install x86_64 Homebrew and dependencies
+        run: |
+          # Install x86_64 Homebrew
+          arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          # Install x86_64 dependencies
+          arch -x86_64 /usr/local/bin/brew install \
+            sdl2 \
+            libjpeg-turbo \
+            libpng \
+            libvorbis \
+            libogg \
+            openal-soft \
+            jsoncpp
+
+      - name: Build arm64
+        run: |
+          OPENAL_PREFIX=$(brew --prefix openal-soft)
+          OPENAL_LIB=$(find "${OPENAL_PREFIX}/lib" -name "libopenal*.dylib" -not -type l | head -1)
+          cmake -B build-arm64 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=lugaru-arm64 \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix)" \
+            -DCMAKE_OSX_ARCHITECTURES="arm64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION" \
+            -DOPENAL_INCLUDE_DIR="${OPENAL_PREFIX}/include" \
+            -DOPENAL_LIBRARY="${OPENAL_LIB}"
+          cmake --build build-arm64 --config Release -j$(sysctl -n hw.ncpu)
+          cmake --install build-arm64 --config Release
+
+      - name: Build x86_64
+        run: |
+          OPENAL_PREFIX="/usr/local/opt/openal-soft"
+          OPENAL_LIB=$(find "${OPENAL_PREFIX}/lib" -name "libopenal*.dylib" -not -type l | head -1)
+          cmake -B build-x86_64 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=lugaru-x86_64 \
+            -DCMAKE_PREFIX_PATH="/usr/local" \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DCMAKE_CXX_FLAGS="-DGL_SILENCE_DEPRECATION" \
+            -DOPENAL_INCLUDE_DIR="${OPENAL_PREFIX}/include" \
+            -DOPENAL_LIBRARY="${OPENAL_LIB}"
+          cmake --build build-x86_64 --config Release -j$(sysctl -n hw.ncpu)
+          cmake --install build-x86_64 --config Release
+
+      - name: Create universal binary
+        run: |
+          # Copy arm64 build as base
+          cp -R lugaru-arm64 lugaru-web-native-macos-universal
+
+          # Find and lipo the main binary
+          ARM64_BIN=$(find lugaru-arm64 -name "lugaru" -type f -perm +111 | head -1)
+          X86_64_BIN=$(find lugaru-x86_64 -name "lugaru" -type f -perm +111 | head -1)
+          UNIVERSAL_BIN=$(find lugaru-web-native-macos-universal -name "lugaru" -type f -perm +111 | head -1)
+
+          if [ -n "$ARM64_BIN" ] && [ -n "$X86_64_BIN" ] && [ -n "$UNIVERSAL_BIN" ]; then
+            lipo -create "$ARM64_BIN" "$X86_64_BIN" -output "$UNIVERSAL_BIN"
+            echo "Created universal binary:"
+            file "$UNIVERSAL_BIN"
+            lipo -info "$UNIVERSAL_BIN"
+          else
+            echo "Error: Could not find binaries for lipo"
+            exit 1
+          fi
+
+      - name: Smoke test
+        run: |
+          echo "Verifying universal binary..."
+          BINARY=$(find lugaru-web-native-macos-universal -name "lugaru" -type f -perm +111 | head -1)
+          if [ -n "$BINARY" ]; then
+            file "$BINARY"
+            lipo -info "$BINARY"
+            echo "macOS universal build smoke test passed"
+          else
+            echo "Error: Could not find lugaru binary"
+            exit 1
+          fi
+
+      - name: Rename for release
+        run: mv lugaru-web-native-macos-universal lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal
+
+      - name: Create archive
+        if: ${{ inputs.create_archives }}
+        run: zip -r lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal.zip lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal/
+
+      - name: Upload artifact (archive)
+        if: ${{ inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal.zip
+
+      - name: Upload artifact (directory)
+        if: ${{ !inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-macos-universal/
+
+  build-windows:
+    needs: get-version
+    name: build-windows (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    container: fedora:41
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            mingw_prefix: mingw64
+            toolchain_arch: x86_64-w64-mingw32
+          - arch: x86
+            mingw_prefix: mingw32
+            toolchain_arch: i686-w64-mingw32
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache dnf packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/dnf
+          key: ${{ runner.os }}-dnf-${{ matrix.mingw_prefix }}-${{ hashFiles('.github/workflows/*.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-dnf-${{ matrix.mingw_prefix }}-
+
+      - name: Install dependencies
+        run: |
+          dnf -y install \
+            cmake \
+            make \
+            zip \
+            file \
+            ${{ matrix.mingw_prefix }}-gcc \
+            ${{ matrix.mingw_prefix }}-gcc-c++ \
+            ${{ matrix.mingw_prefix }}-binutils \
+            ${{ matrix.mingw_prefix }}-headers \
+            ${{ matrix.mingw_prefix }}-libjpeg-turbo \
+            ${{ matrix.mingw_prefix }}-libpng \
+            ${{ matrix.mingw_prefix }}-SDL2 \
+            ${{ matrix.mingw_prefix }}-libvorbis \
+            ${{ matrix.mingw_prefix }}-libogg \
+            ${{ matrix.mingw_prefix }}-openal-soft \
+            ${{ matrix.mingw_prefix }}-jsoncpp
+
+      - name: Configure
+        run: |
+          export PKG_CONFIG_LIBDIR="/usr/${{ matrix.toolchain_arch }}/sys-root/mingw/lib/pkgconfig:/usr/${{ matrix.toolchain_arch }}/sys-root/mingw/share/pkgconfig"
+          cmake -B build \
+            -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw/toolchain-${{ matrix.mingw_prefix }}.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}
+
+      - name: Build
+        run: cmake --build build --config Release -j$(nproc)
+
+      - name: Install
+        run: cmake --install build --config Release
+
+      - name: Smoke test
+        run: |
+          echo "Verifying Windows binary exists..."
+          test -f lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/lugaru.exe || test -f lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/bin/lugaru.exe
+          echo "Checking binary format..."
+          file lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/*.exe 2>/dev/null || file lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/bin/*.exe 2>/dev/null || true
+          echo "Windows ${{ matrix.arch }} build smoke test passed"
+
+      - name: Create archive
+        if: ${{ inputs.create_archives }}
+        run: zip -r lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}.zip lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/
+
+      - name: Upload artifact (archive)
+        if: ${{ inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}.zip
+
+      - name: Upload artifact (directory)
+        if: ${{ !inputs.create_archives }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}
+          path: lugaru-web-native-${{ needs.get-version.outputs.version }}-windows-${{ matrix.arch }}/

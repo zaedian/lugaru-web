@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAL3UExURQAAAIBqUn9caYZ9Xl9fUGJPTF8wMGc2OTVogGZ9gzBfgE5wgmJygF+AgGuCfmppfF9fgM7p9j48PCo1SRkbQCMoVUJCZl1dUpeUcJOhzIFrYIVlbDo5SQ4QLFVLT3h5aJmGnVBISDYwLy0qLCUtMmU9OiuzxjYuNDVBXf///yE0RBsjKSUtVVFheSopW1BhhBkabUBJhR4reVJfly02gF5plTY4gC04gE9pnVptqP//4D5Oiltxov//Wi1idkBYlVBqkGJ0j3R+kVRzpEhTc3RiUoJ2ampwhJdkfm9vcGJVTCYjIVZOQ29jVG9rVP/jSCQkTSUpTQcORQYOPgQOKgoGLBIVQhwZJyYkIiYkQBUhagsQTwsKKQUPJR4cKxQVEhEMCjMrMRMNDBUSDzg0Lio0WyAxdBoeUQwWOjIrNDIoJBsZFzYyLBkaNSslIigeG1NCODY2STRCfS88eiMuZE1JR1JEODsxLTYvLhUfOwoLLjoyMUM0KFtHPEk+STpGeUJUjD9QhlxRVVtHP0Q5Li4qMhwqWik3bA0UZjAzV1NEPmNQQVRGQFJZbGBqnFprmFlQSl1JPkU7OiovTClFgik9gSo7f0VYjGVwl1tTYnBaSFVDRVZWWY2Tl2lpfVJDP2NTRjk4Qltli1droD9aj0tVhyItdUtch4+TpHN7lVpPVl5QRWhZV3h5fFVMUGRTSFBCP1ZbcZWmqYCItmVvplNqmVJkiYWMppKXpmtugGpZUXBhTW1bTGVUSkU7NEpMXqOls6Orq4KdtGRuojZHg3GCpI2VqnZ1e3BWSnZfTH9nUHFYSTExL4eZoKCuvp+isX2Gr1FmnFhnk4KKm3txZ3NdS4hxVn1wVkU4MDIsNpmgo5yutIWdt2t+qz5TllRklW9fWH1sUoaAYXZeSkE0MFJSV6WurpKir3mGr1dspUBcmU9MWmpZTF5YRy0qICEiGXBoXIZ+f3p3d2htgE1APCYaFxMREmJQQXtlUndhUi0pJFBFO////4WI6wUAAABQdFJOUwAAAAAAAAAAAAAAAAAAAAAAATWc1NScky4BEySJ5aMOCqLo/pwPA62JATXj5TWcnNTU1NScnDXl5TUBiYkBD5ycDw+J5eWJDwE1nNTUnDUBrExt3wAAAAFiS0dEKcq3hSQAAAAHdElNRQfpCxkXNxet41noAAABG0lEQQY0wEQAe/+AAABAhESExRQURUWFxgDBAAAGRobHB1SU1RVVldYHh8FBgAgISIjWVpbXF1eX2BhJCUHACYnYmNkZWZnaGlqa2xtKCkAKitub3BxcnN0dXZ3eHksLQAuent8fX5/gIGCg4SFhocvADCIiYqLjI2Oj5CRkpOUlTEAlpeYmZqbnJ2en6ChoqOkpQCmp6ipqqusra6vsLGys7S1ADK2t7i5uru8vb6/wMHCwzMANMTFxsfIycrLzM3Oz9DRNQA2N9LT1NXW19jZ2tvc3Tg5ADo73t/g4eLj5OXm5+jpPD0ACD4/6uvs7e7v8PHy80BBCQAKC0JDRPT19vf4+UVGRwwNAAANDkhJSkv6+0xNTk8PEADjvXuYVN+TRgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyNS0xMS0yNVQyMzoyMDoxMSswMDowMDXgfXUAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjUtMTEtMjVUMjM6MjA6MTErMDA6MDBEvcXJAAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDI1LTExLTI1VDIzOjU1OjIzKzAwOjAwxaosGwAAAABJRU5ErkJggg==">
+  <title>Lugaru-Web</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-touch-callout: none !important;
+      outline: none !important;
+    }
+    *:focus {
+      outline: none !important;
+    }
+    *::selection {
+      background: transparent !important;
+    }
+    *::-moz-selection {
+      background: transparent !important;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: Arial, sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #canvas-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    canvas.emscripten {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      cursor: none;
+      outline: none !important;
+      border: none !important;
+      -webkit-touch-callout: none;
+    }
+    canvas:focus, canvas:focus-visible,
+    #canvas-wrapper:focus, #canvas-wrapper:focus-visible,
+    #container:focus, #container:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+    /* Disable focus-visible ring */
+    :focus-visible {
+      outline: none !important;
+    }
+    /* Fullscreen styles */
+    #canvas-wrapper:fullscreen,
+    #canvas-wrapper:-webkit-full-screen {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+    }
+    #canvas-wrapper:fullscreen canvas,
+    #canvas-wrapper:-webkit-full-screen canvas {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain;
+    }
+    #fpsCounter {
+      display: none;
+    }
+    #status {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 8px;
+      border: 2px solid #333;
+      z-index: 1000;
+      color: #fff;
+    }
+    #status.hidden {
+      display: none;
+    }
+    #progress {
+      width: 300px;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px auto;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f00, #a00);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    #status-text {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #f00;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="canvas-wrapper">
+      <div id="fpsCounter">FPS: --</div>
+      <div id="status">
+        <div id="progress">
+          <div id="progress-bar"></div>
+        </div>
+        <div id="status-text">Loading...</div>
+      </div>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+    </div>
+  </div>
+
+  <script type='text/javascript'>
+    var statusElement = document.getElementById('status');
+    var progressElement = document.getElementById('progress-bar');
+    var statusTextElement = document.getElementById('status-text');
+
+    var Module = {
+      locateFile: function(path) {
+        return path;
+      },
+      canvas: document.getElementById('canvas'),
+      print: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.log(text);
+      },
+      printErr: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+      },
+      setStatus: function(text) {
+        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+        if (text === Module.setStatus.last.text) return;
+
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+        var now = Date.now();
+
+        if (m && now - Module.setStatus.last.time < 30) return;
+        Module.setStatus.last.time = now;
+        Module.setStatus.last.text = text;
+
+        if (m) {
+          text = m[1];
+          progressElement.style.width = (parseInt(m[2])/parseInt(m[4])*100) + '%';
+          statusTextElement.innerHTML = text;
+        } else {
+          if (text) {
+            progressElement.style.width = '100%';
+            statusTextElement.innerHTML = text;
+          } else {
+            statusElement.classList.add('hidden');
+          }
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Loading... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+      }
+    };
+
+    Module.setStatus('Downloading...');
+
+    var fpsCounter = document.getElementById('fpsCounter');
+    var lastFrameTime = performance.now();
+    var frameCount = 0;
+    var fps = 0;
+    var fpsUpdateTime = 0;
+
+    function updateFPS() {
+      var now = performance.now();
+      var delta = now - lastFrameTime;
+      lastFrameTime = now;
+
+      frameCount++;
+      fpsUpdateTime += delta;
+
+      if (fpsUpdateTime >= 500) {
+        fps = Math.round((frameCount * 1000) / fpsUpdateTime);
+        fpsCounter.textContent = 'FPS: ' + fps;
+
+        if (fps >= 60) {
+          fpsCounter.style.color = '#f00';
+        } else if (fps >= 30) {
+          fpsCounter.style.color = '#ff0';
+        } else {
+          fpsCounter.style.color = '#f44';
+        }
+
+        frameCount = 0;
+        fpsUpdateTime = 0;
+      }
+
+      requestAnimationFrame(updateFPS);
+    }
+
+    requestAnimationFrame(updateFPS);
+
+    window.onerror = function(event) {
+      Module.setStatus('Exception thrown, see JavaScript console');
+      statusElement.classList.remove('hidden');
+    };
+
+    // Pointer lock and fullscreen handling
+    var canvas = document.getElementById('canvas');
+    var canvasWrapper = document.getElementById('canvas-wrapper');
+
+    // Auto-focus canvas for keyboard input
+    canvas.focus();
+
+    // Ensure canvas gets focus on any interaction
+    document.addEventListener('click', function() {
+      canvas.focus();
+    });
+
+    // Forward keyboard events to canvas to ensure SDL receives them
+    window.addEventListener('keydown', function(e) {
+      if (document.activeElement !== canvas) {
+        canvas.focus();
+      }
+    }, true);
+
+    window.addEventListener('keyup', function(e) {
+      if (document.activeElement !== canvas) {
+        canvas.focus();
+      }
+    }, true);
+
+    // Request pointer lock on canvas click
+    canvas.addEventListener('click', function() {
+      canvas.focus();
+      if (document.pointerLockElement !== canvas) {
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+        canvas.requestPointerLock();
+      }
+    });
+
+    // Fullscreen on F key or double-click
+    function requestFullscreen() {
+      var elem = canvasWrapper;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    }
+
+    canvas.addEventListener('dblclick', function(e) {
+      e.preventDefault();
+      requestFullscreen();
+    });
+
+    // F11 or Alt+F for fullscreen (use bubbling phase to not interfere with SDL)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F11' || (e.key === 'f' && e.altKey)) {
+        e.preventDefault();
+        requestFullscreen();
+      }
+    }, false);
+
+    // Re-lock pointer after fullscreen change
+    document.addEventListener('fullscreenchange', function() {
+      if (document.fullscreenElement === canvasWrapper) {
+        canvas.requestPointerLock();
+      }
+    });
+    document.addEventListener('webkitfullscreenchange', function() {
+      if (document.webkitFullscreenElement === canvasWrapper) {
+        canvas.requestPointerLock();
+      }
+    });
+
+    // Pause/mute audio when tab loses focus
+    document.addEventListener('visibilitychange', function() {
+      if (typeof AL !== 'undefined' && AL.currentCtx && AL.currentCtx.audioCtx) {
+        var audioCtx = AL.currentCtx.audioCtx;
+        if (document.hidden) {
+          audioCtx.suspend();
+        } else {
+          audioCtx.resume();
+        }
+      }
+    });
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 OSS Lugaru contributors -->
+<!-- Originally written by Neal Gompa <ngompa13@gmail.com> -->
+<!-- Updated for Loupgarenne fork -->
+<component type="desktop">
+  <id>lugaru.desktop</id>
+  <metadata_license>CC-BY-SA-4.0</metadata_license>
+  <project_license>GPL-2.0+ and CC-BY-SA-3.0</project_license>
+  <name>Lugaru HD</name>
+  <summary>Third person ninja rabbit fighting game (fork of Lugaru HD)</summary>
+  <description>
+    <p>
+      Loupgarenne is a fork of OSS Lugaru, based on Lugaru HD by Wolfire Games and the open-source Lugaru OSS project.
+    </p>
+
+    <p>
+      Lugaru (pronounced Loo-GAH-roo) is a cross-platform third-person action game.
+      The main character, Turner, is an anthropomorphic rebel bunny rabbit with impressive combat skills.
+    </p>
+
+    <p>
+      In his quest to find those responsible for slaughtering his village,
+      he uncovers a far-reaching conspiracy involving the corrupt leaders
+      of the rabbit republic and the starving wolves from a nearby den.
+      Turner takes it upon himself to fight against their plot and save
+      his fellow rabbits from slavery.
+    </p>
+  </description>
+  <releases>
+    <release version="1.3-loupgarenne" date="2025-11-19"/>
+  </releases>
+  <content_rating type="oars-1.0">
+    <content_attribute id="violence-cartoon">intense</content_attribute>
+    <content_attribute id="violence-fantasy">intense</content_attribute>
+    <content_attribute id="violence-bloodshed">mild</content_attribute>
+    <content_attribute id="language-profanity">mild</content_attribute>
+  </content_rating>
+  <url type="homepage">https://github.com/ryandeering/loupgarenne</url>
+  <url type="bugtracker">https://github.com/ryandeering/loupgarenne/issues</url>
+</component>
+
